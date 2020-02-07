@@ -1,77 +1,59 @@
 import React, { Component } from 'react';
 import './App.css';
-import Person from './Person/Person';
+import Text from './Text/Text';
+import Validation from './Validation/Validation';
+import Char from './Char/Char';
 
 class App extends Component {
   state = {
-    persons : [
-      {id: 0, name: 'Max', age: 28},
-      {id: 1, name: 'Manu', age: 29},
-      {id: 2, name: 'Stefanie', age: 26},
-      {id: 3, name: 'Brad', age: 38}
-    ],
-    showPersons: false
+    count: 0,
+    word: ''
   }
 
-  nameChangedHandler = (event, id) =>
-  {
-    const personIndex = this.state.persons.findIndex(p=>{
-        return p.id === id;
-    });
-
-    // spread operator for immutability, Object.assign() could also be used
-    const person = {...this.state.persons[personIndex]};
-
-    person.name = event.target.value;
-    const persons = [...this.state.persons];
-    persons[personIndex] = person;
-
+  changeHandler = (event) => {
+    const letterCount = event.target.value.length
     this.setState({
-      persons : persons
+      count: letterCount,
+      word: event.target.value
     })
   }
 
-  deletePersonHandler = (personIndex) => {
-    const persons = [...this.state.persons];
-    persons.splice(personIndex, 1);
-    this.setState({persons: persons});
-  }
-
-  togglePersonsHandler = () => {
-    this.setState({showPersons: !this.state.showPersons})
+  deleteLetterHandler = (index) => {
+    const word = [...this.state.word];
+    word.splice(index, 1)
+    this.setState({word: word.join('')});
   }
 
   render() {
-    const style = {
-      backgroundColor: 'white',
-      font: 'inherit',
-      border: '1px solid blue',
-      padding: '8px',
-      cursor: 'pointer'
-    }
-
-    let persons = null;
-
-    if(this.state.showPersons) {
-        persons = (
-          <div>
-            {this.state.persons.map((person, index) => {
-              return <Person name={person.name} age={person.age}
-                             click={()=>this.deletePersonHandler(index)}
-                             key={person.id}
-                             changed={(event)=>this.nameChangedHandler(event, person.id)}/>
-            })}
-          </div>
-        );
-    }
+    const chars = (
+      <div>
+        {
+          this.state.word.split('').map((letter,index) =>{
+            return <Char letter={this.state.word[index]}
+                         click={()=>this.deleteLetterHandler(index)}/>
+          })
+        }
+      </div>
+      );
 
     return (
       <div className="App">
-        <h1>Hi, I'm a React App</h1>
-        <p>This is really working!</p>
-        <button style={style}
-                onClick={this.togglePersonsHandler}>Toggle Persons</button>
-        {persons}    
+        
+        <Text count={this.state.count} changeHandler={this.changeHandler} word={this.state.word}/>
+        <Validation letterCount={this.state.count}/>
+        {chars}
+
+        <div>
+          <ol>
+            <li>Create an input field (in App component) with a change listener which outputs the length of the entered text below it (e.g. in a paragraph).</li>
+            <li>Create a new component (=> ValidationComponent) which receives the text length as a prop</li>
+            <li>Inside the ValidationComponent, either output "Text too short" or "Text long enough" depending on the text length (e.g. take 5 as a minimum length)</li>
+            <li>Create another component (=> CharComponent) and style it as an inline box (=> display: inline-block, padding: 16px, text-align: center, margin: 16px, border: 1px solid black).</li>
+            <li>Render a list of CharComponents where each CharComponent receives a different letter of the entered text (in the initial input field) as a prop.</li>
+            <li>When you click a CharComponent, it should be removed from the entered text.</li>
+          </ol>
+          <p>Hint: Keep in mind that JavaScript strings are basically arrays!</p>
+        </div>
       </div>
     );
   }
